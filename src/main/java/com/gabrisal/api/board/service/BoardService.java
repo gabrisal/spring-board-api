@@ -124,4 +124,13 @@ public class BoardService {
             }
         }
     }
+
+    public int deleteBoard(SearchBoardIn board) {
+        int result = deleteBoardById(board.getBoardId());
+        BoardTag boardTag = BoardTag.builder()
+                .boardId(board.getBoardId())
+                .build();
+        deleteBoardTagRelByBoardId(boardTag);
+        return result;
+    }
 }
