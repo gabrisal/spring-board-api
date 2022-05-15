@@ -1,4 +1,4 @@
-package com.gabrisal.api.board;
+package com.gabrisal.api.board.model;
 
 import lombok.*;
 
@@ -11,10 +11,10 @@ public class Board {
     private String boardTitle;
     private String boardContent;
     private boolean delYn;
-    private int frstRegUserId;
+    private String frstRegUserId;
     private String frstRegUserIpAddr;
     private Timestamp frstRegDttm;
-    private int lastUpdUserId;
+    private String lastUpdUserId;
     private String lastUpdUserIpAddr;
     private Timestamp lastUpdDttm;
 
