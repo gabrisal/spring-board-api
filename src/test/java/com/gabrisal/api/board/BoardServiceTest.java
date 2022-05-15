@@ -1,12 +1,10 @@
 package com.gabrisal.api.board;
 
-import com.gabrisal.api.board.model.Board;
 import com.gabrisal.api.board.service.BoardService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 class BoardServiceTest {
@@ -14,16 +12,22 @@ class BoardServiceTest {
     @Autowired
     private BoardService service;
 
+    @DisplayName("게시판_단건_조회")
     @Test
     void getBoardById() {
-        Board board = service.getBoardById(2);
-        System.out.println("============= board :" + board);
+        // given
+        // when
+//        Board board = service.getBoardById(boardId);
+//        System.out.println("============= board :" + board);
+
+        // then
+//        Assertions.assertThat(board).
+
     }
 
+    @DisplayName("게시판_목록_조회")
     @Test
     void getBoardList() {
-        List<Board> boardList = service.getBoardList();
-        System.out.println("============= boardList :" + boardList);
     }
 
 }
