@@ -1,3 +1,42 @@
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users
+(
+    user_id                   VARCHAR2(20)    PRIMARY KEY,
+    password                  VARCHAR2(100)   NOT NULL,
+    name                      VARCHAR2(15)    NOT NULL,
+    nick                      VARCHAR2(15)    NOT NULL,
+    birthday                  VARCHAR2(8)     NOT NULL,
+    gender                    VARCHAR2(1)     NOT NULL,
+    email_addr                VARCHAR2(100)   NOT NULL,
+    del_yn                    BOOLEAN         NOT NULL        DEFAULT FALSE,
+    frst_reg_user_id          VARCHAR2(15)    NOT NULL,
+    frst_reg_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    last_upd_user_id          VARCHAR2(15)    NOT NULL,
+    last_upd_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users
+( user_id
+, password
+, name
+, nick
+, birthday
+, gender
+, email_addr
+, frst_reg_user_id
+, last_upd_user_id )
+VALUES
+    ('gbrisal'
+    , 'password1!'
+    , '김지영'
+    , '착한사람'
+    , '19940806'
+    , '2'
+    , 'jy942013@naver.com'
+    , 'gbrisal'
+    , 'gbrisal');
+
 DROP TABLE IF EXISTS board;
 
 CREATE TABLE board
@@ -15,14 +54,23 @@ CREATE TABLE board
 );
 
 INSERT INTO board
-( board_id
-, board_title
+( board_title
 , board_content
 , frst_reg_user_id
 , last_upd_user_id )
 VALUES
-    (1
-    , '테스트'
+    ('테스트'
     , '내용'
-    , 1
-    , 1);
+    , 'gbrisal'
+    , 'gbrisal');
+
+INSERT INTO board
+( board_title
+, board_content
+, frst_reg_user_id
+, last_upd_user_id )
+VALUES
+    ('테스트2'
+    , '내용2'
+    , 'gbrisal'
+    , 'gbrisal');
