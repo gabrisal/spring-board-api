@@ -30,4 +30,6 @@ public interface BoardRepository {
 
     int insertBoardTagRel(BoardTag boardTag);
 
+    int deleteBoardTagRelByBoardId(BoardTag boardTag);
+
 }

@@ -4,12 +4,22 @@
 <mapper namespace="com.gabrisal.api.board.repository.BoardRepository">
 
     <select id="selectBoardOne" resultType="com.gabrisal.api.board.dto.SearchBoardOut">
-        SELECT board_id
-             , board_title
-             , board_content
-             , del_yn
-          FROM board
-         WHERE board_id = #{boardId}
+        SELECT a.board_id
+             , a.board_title
+             , a.board_content
+             , a.frst_reg_dttm
+             , nvl(d.nick, '탈퇴한 회원')                      AS writer
+             , '#' || group_concat(c.tag_name separator '#') AS tags
+         FROM board a
+         LEFT OUTER JOIN board_tag_relation b
+           ON a.board_id = b.board_id
+         LEFT OUTER JOIN tags c
+           ON b.tag_id = c.tag_id
+          AND c.del_yn = false
+         LEFT OUTER JOIN users d
+           ON a.frst_reg_user_id = d.user_id
+        WHERE a.board_id = #{boardId}
+        GROUP BY a.board_id
     </select>
 
     <select id="selectBoardList" resultType="com.gabrisal.api.board.dto.SearchBoardOut">
@@ -17,7 +27,7 @@
              , a.board_title
              , a.board_content
              , a.frst_reg_dttm
-             , nvl(d.nick, '탈퇴한 회원')                       AS writer
+             , nvl(d.nick, '탈퇴한 회원')                      AS writer
              , '#' || group_concat(c.tag_name separator '#') AS tags
          FROM board a
          LEFT OUTER JOIN board_tag_relation b
@@ -142,5 +152,10 @@
             , #{lastUpdUserIpAddr}
             , NOW());
     </insert>
+
+    <delete id="deleteBoardTagRelByBoardId">
+        DELETE FROM board_tag_relation
+         WHERE board_id = #{boardId}
+    </delete>
 
 </mapper>

@@ -10,6 +10,7 @@ import com.gabrisal.api.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class BoardService {
         return repository.deleteBoardById(boardId);
     }
 
+    @Transactional(readOnly = true)
     public Tag selectTagByName(Tag tag) {
         return repository.selectTagByName(tag);
     }
@@ -58,6 +60,10 @@ public class BoardService {
         return repository.insertBoardTagRel(boardTag);
     }
 
+    public int deleteBoardTagRelByBoardId(BoardTag boardTag) {
+        return repository.deleteBoardTagRelByBoardId(boardTag);
+    }
+
     public int saveBoard(AddBoardIn in) {
         Board board = Board.builder()
                     .boardTitle(in.getBoardTitle())
@@ -66,29 +72,56 @@ public class BoardService {
                     .lastUpdUserId(in.getRegUserId())
                     .build();
         int result = insertBoard(board);
+        saveHashTagList(in, board);
+        return result;
+    }
 
-        for (Tag tag : in.getTagList()) {
-            Tag existTag = selectTagByName(tag);
+    public int modifyBoard(AddBoardIn in) {
+        // TODO: 유효한 게시글이 아닐 경우 처리
+        Board board = Board.builder()
+                .boardId(in.getBoardId())
+                .boardTitle(in.getBoardTitle())
+                .boardContent(in.getBoardContent())
+                .frstRegUserId(in.getRegUserId())
+                .lastUpdUserId(in.getRegUserId())
+                .build();
+        int result = updateBoard(board);
 
-            // XXX: 태그에 시스템 컬럼이 필요할까?
-            tag.setFrstRegUserId(in.getRegUserId());
-            tag.setLastUpdUserId(in.getRegUserId());
-            if (existTag != null) {
-                tag.setTagId(existTag.getTagId());
-                updateTag(tag);
-            } else {
-                insertTag(tag);
-            }
+        BoardTag boardTag = BoardTag.builder()
+                .boardId(board.getBoardId())
+                .build();
+        deleteBoardTagRelByBoardId(boardTag);
 
-            BoardTag boardTag = BoardTag.builder()
-                    .boardId(board.getBoardId())
-                    .tagId(tag.getTagId())
-                    .frstRegUserId(in.getRegUserId())
-                    .lastUpdUserId(in.getRegUserId())
-                    .build();
-            insertBoardTagRel(boardTag);
-        }
+        // XXX: 해시태그를 참조하는 게시글이 사라지면 해시태그도 지워야하지않을까?
+
+        saveHashTagList(in, board);
 
         return result;
+    }
+
+    private void saveHashTagList(AddBoardIn in, Board board) {
+        if (!CollectionUtils.isEmpty(in.getTagList())) {
+            for (Tag tag : in.getTagList()) {
+                Tag existTag = selectTagByName(tag);
+
+                // XXX: 태그에 시스템 컬럼이 필요할까?
+                tag.setFrstRegUserId(in.getRegUserId());
+                tag.setLastUpdUserId(in.getRegUserId());
+                if (existTag != null) {
+                    tag.setTagId(existTag.getTagId());
+                    updateTag(tag);
+                } else {
+                    insertTag(tag);
+                }
+
+                BoardTag boardTag = BoardTag.builder()
+                        .boardId(board.getBoardId())
+                        .tagId(tag.getTagId())
+                        .frstRegUserId(in.getRegUserId())
+                        .lastUpdUserId(in.getRegUserId())
+                        .build();
+                insertBoardTagRel(boardTag);
+            }
+        }
     }
 }
