@@ -8,6 +8,7 @@
              , a.board_title
              , a.board_content
              , a.frst_reg_dttm
+             , a.last_upd_dttm
              , nvl(d.nick, '탈퇴한 회원')                      AS writer
              , '#' || group_concat(c.tag_name separator '#') AS tags
          FROM board a
@@ -28,6 +29,7 @@
              , a.board_title
              , a.board_content
              , a.frst_reg_dttm
+             , a.last_upd_dttm
              , nvl(d.nick, '탈퇴한 회원')                      AS writer
              , '#' || group_concat(c.tag_name separator '#') AS tags
          FROM board a

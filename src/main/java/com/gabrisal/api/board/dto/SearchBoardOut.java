@@ -16,6 +16,7 @@ public class SearchBoardOut {
     private String boardContent;
     private String writer;
     private Timestamp frstRegDttm;
+    private Timestamp lastUpdDttm;
     private String tags;
 
 }
