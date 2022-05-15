@@ -19,6 +19,7 @@
          LEFT OUTER JOIN users d
            ON a.frst_reg_user_id = d.user_id
         WHERE a.board_id = #{boardId}
+          AND a.del_yn = false
         GROUP BY a.board_id
     </select>
 
