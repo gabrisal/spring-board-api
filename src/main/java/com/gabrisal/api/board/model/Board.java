@@ -4,7 +4,7 @@ import lombok.*;
 
 import java.sql.Timestamp;
 
-@NoArgsConstructor @Getter @Setter @ToString
+@Builder @Getter @Setter @ToString
 public class Board {
 
     private int boardId;
