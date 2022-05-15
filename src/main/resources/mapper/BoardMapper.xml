@@ -1,13 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gabrisal.api.board.BoardRepository">
-    <select id="selectBoardOne" parameterType="int" resultType="com.gabrisal.api.board.Board">
-        SELECT BOARD_ID
-             , BOARD_TITLE
-             , BOARD_CONTENT
-             , DEL_YN
-          FROM BOARD
-         WHERE BOARD_ID = #{boardId}
+<mapper namespace="com.gabrisal.api.board.repository.BoardRepository">
+
+    <select id="selectBoardOne" parameterType="int" resultType="com.gabrisal.api.board.model.Board">
+        SELECT board_id
+             , board_title
+             , board_content
+             , del_yn
+          FROM board
+         WHERE board_id = #{boardId}
     </select>
+
+    <select id="selectBoardList" resultType="com.gabrisal.api.board.model.Board">
+        SELECT a.board_id
+             , a.board_title
+             , a.board_content
+             , a.del_yn
+             , b.nick           AS writer
+         FROM board a, users b
+        WHERE a.frst_reg_user_id = b.user_id
+          AND a.del_yn = false
+        ORDER BY board_id DESC
+    </select>
+
+    <insert id="insertBoard">
+        INSERT INTO board
+            ( board_title
+            , board_content
+            , frst_reg_user_id
+            , frst_reg_user_ip_addr
+            , frst_reg_dttm
+            , last_upd_user_id
+            , last_upd_user_ip_addr
+            , last_upd_dttm)
+        VALUES
+            ( #{boardTitle}
+            , #{boardContent}
+            , #{frstRegUserId}
+            , #{frstRegUserIpAddr}
+            , NOW()
+            , #{lastUpdUserId}
+            , #{lastUpdUserIpAddr}
+            , NOW());
+    </insert>
+
+    <update id="updateBoard">
+        UPDATE board
+        <trim prefix="SET" prefixOverrides=",">
+            , last_upd_user_id = #{lastUpdUserId}
+            , last_upd_dttm = NOW()
+            <if test="lastUpdUserIpAddr != null and lastUpdUserIpAddr != ''">
+                , last_upd_user_ip_addr = #{lastUpdUserIpAddr}
+            </if>
+            <if test="boardTitle != null and boardTitle != ''">
+                , board_title = #{boardTitle}
+            </if>
+            <if test="boardContent != null and boardContent != ''">
+                , board_content = #{boardContent}
+            </if>
+        </trim>
+        WHERE board_id = #{boardId}
+    </update>
+
+    <update id="deleteBoardById">
+        UPDATE board
+        <trim prefix="SET" prefixOverrides=",">
+            , last_upd_user_id = #{lastUpdUserId}
+            , last_upd_dttm = NOW()
+            <if test="lastUpdUserIpAddr != null and lastUpdUserIpAddr != ''">
+                , last_upd_user_ip_addr = #{lastUpdUserIpAddr}
+            </if>
+            , del_yn = true
+        </trim>
+        WHERE board_id = #{boardId}
+    </update>
+
 </mapper>
