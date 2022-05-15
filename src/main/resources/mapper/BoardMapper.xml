@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gabrisal.api.board.repository.BoardRepository">
 
-    <select id="selectBoardOne" parameterType="int" resultType="com.gabrisal.api.board.model.Board">
+    <select id="selectBoardOne" resultType="com.gabrisal.api.board.dto.SearchBoardOut">
         SELECT board_id
              , board_title
              , board_content
@@ -12,19 +12,27 @@
          WHERE board_id = #{boardId}
     </select>
 
-    <select id="selectBoardList" resultType="com.gabrisal.api.board.model.Board">
+    <select id="selectBoardList" resultType="com.gabrisal.api.board.dto.SearchBoardOut">
         SELECT a.board_id
              , a.board_title
              , a.board_content
-             , a.del_yn
-             , b.nick           AS writer
-         FROM board a, users b
-        WHERE a.frst_reg_user_id = b.user_id
-          AND a.del_yn = false
-        ORDER BY board_id DESC
+             , a.frst_reg_dttm
+             , nvl(d.nick, '탈퇴한 회원')                       AS writer
+             , '#' || group_concat(c.tag_name separator '#') AS tags
+         FROM board a
+         LEFT OUTER JOIN board_tag_relation b
+           ON a.board_id = b.board_id
+         LEFT OUTER JOIN tags c
+           ON b.tag_id = c.tag_id
+          AND c.del_yn = false
+         LEFT OUTER JOIN users d
+           ON a.frst_reg_user_id = d.user_id
+        WHERE a.del_yn = false
+        GROUP BY a.board_id
+        ORDER BY a.board_id DESC
     </select>
 
-    <insert id="insertBoard">
+    <insert id="insertBoard" useGeneratedKeys="true" keyProperty="boardId">
         INSERT INTO board
             ( board_title
             , board_content
@@ -75,5 +83,45 @@
         </trim>
         WHERE board_id = #{boardId}
     </update>
+
+    <insert id="insertTag" useGeneratedKeys="true" keyProperty="tagId">
+        INSERT INTO tags
+        ( tag_name
+        , frst_reg_user_id
+        , frst_reg_user_ip_addr
+        , frst_reg_dttm
+        , last_upd_user_id
+        , last_upd_user_ip_addr
+        , last_upd_dttm)
+        VALUES
+            ( #{tagName}
+            , #{frstRegUserId}
+            , #{frstRegUserIpAddr}
+            , NOW()
+            , #{lastUpdUserId}
+            , #{lastUpdUserIpAddr}
+            , NOW());
+    </insert>
+
+    <insert id="insertBoardTagRel">
+        INSERT INTO board_tag_relation
+        ( board_id
+        , tag_id
+        , frst_reg_user_id
+        , frst_reg_user_ip_addr
+        , frst_reg_dttm
+        , last_upd_user_id
+        , last_upd_user_ip_addr
+        , last_upd_dttm)
+        VALUES
+            ( #{boardId}
+            , #{tagId}
+            , #{frstRegUserId}
+            , #{frstRegUserIpAddr}
+            , NOW()
+            , #{lastUpdUserId}
+            , #{lastUpdUserIpAddr}
+            , NOW());
+    </insert>
 
 </mapper>
