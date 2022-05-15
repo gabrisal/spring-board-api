@@ -22,7 +22,11 @@ public interface BoardRepository {
 
     int deleteBoardById(int boardId);
 
+    Tag selectTagByName(Tag tag);
+
     int insertTag(Tag tag);
+
+    int updateTag(Tag tag);
 
     int insertBoardTagRel(BoardTag boardTag);
 

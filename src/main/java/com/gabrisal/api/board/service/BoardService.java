@@ -42,8 +42,16 @@ public class BoardService {
         return repository.deleteBoardById(boardId);
     }
 
+    public Tag selectTagByName(Tag tag) {
+        return repository.selectTagByName(tag);
+    }
+
     public int insertTag(Tag tag) {
         return repository.insertTag(tag);
+    }
+
+    public int updateTag(Tag tag) {
+        return repository.updateTag(tag);
     }
 
     public int insertBoardTagRel(BoardTag boardTag) {
@@ -60,10 +68,17 @@ public class BoardService {
         int result = insertBoard(board);
 
         for (Tag tag : in.getTagList()) {
+            Tag existTag = selectTagByName(tag);
+
             // XXX: 태그에 시스템 컬럼이 필요할까?
             tag.setFrstRegUserId(in.getRegUserId());
             tag.setLastUpdUserId(in.getRegUserId());
-            insertTag(tag);
+            if (existTag != null) {
+                tag.setTagId(existTag.getTagId());
+                updateTag(tag);
+            } else {
+                insertTag(tag);
+            }
 
             BoardTag boardTag = BoardTag.builder()
                     .boardId(board.getBoardId())

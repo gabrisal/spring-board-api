@@ -84,6 +84,13 @@
         WHERE board_id = #{boardId}
     </update>
 
+    <select id="selectTagByName" resultType="com.gabrisal.api.board.model.Tag">
+        SELECT tag_id
+          FROM tags
+         WHERE tag_name = #{tagName}
+           AND del_yn = false
+    </select>
+
     <insert id="insertTag" useGeneratedKeys="true" keyProperty="tagId">
         INSERT INTO tags
         ( tag_name
@@ -102,6 +109,18 @@
             , #{lastUpdUserIpAddr}
             , NOW());
     </insert>
+
+    <update id="updateTag">
+        UPDATE tags
+        <trim prefix="SET" prefixOverrides=",">
+            , last_upd_user_id = #{lastUpdUserId}
+            , last_upd_dttm = NOW()
+            <if test="lastUpdUserIpAddr != null and lastUpdUserIpAddr != ''">
+                , last_upd_user_ip_addr = #{lastUpdUserIpAddr}
+            </if>
+        </trim>
+        WHERE tag_id = #{tagId}
+    </update>
 
     <insert id="insertBoardTagRel">
         INSERT INTO board_tag_relation
