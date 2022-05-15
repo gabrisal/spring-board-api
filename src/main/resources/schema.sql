@@ -74,3 +74,33 @@ VALUES
     , '내용2'
     , 'gbrisal'
     , 'gbrisal');
+
+DROP TABLE IF EXISTS tags;
+
+CREATE TABLE tags
+(
+    tag_id                    INT             AUTO_INCREMENT  PRIMARY KEY,
+    tag_name                  VARCHAR2(100)   NOT NULL,
+    del_yn                    BOOLEAN         NOT NULL        DEFAULT FALSE,
+    frst_reg_user_id          VARCHAR2(15)    NOT NULL,
+    frst_reg_user_ip_addr     VARCHAR2(15),
+    frst_reg_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    last_upd_user_id          VARCHAR2(15)    NOT NULL,
+    last_upd_user_ip_addr     VARCHAR2(15),
+    last_upd_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS board_tag_relation;
+
+CREATE TABLE board_tag_relation
+(
+    board_id                  INT,
+    tag_id                    INT,
+    frst_reg_user_id          VARCHAR2(15)    NOT NULL,
+    frst_reg_user_ip_addr     VARCHAR2(15),
+    frst_reg_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    last_upd_user_id          VARCHAR2(15)    NOT NULL,
+    last_upd_user_ip_addr     VARCHAR2(15),
+    last_upd_dttm             DATE            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (board_id, tag_id)
+);
