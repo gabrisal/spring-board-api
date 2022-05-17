@@ -95,6 +95,7 @@
             , del_yn = true
         </trim>
         WHERE board_id = #{boardId}
+          AND del_yn = false
     </update>
 
     <select id="selectTagByName" resultType="com.gabrisal.api.board.model.Tag">
