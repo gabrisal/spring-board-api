@@ -31,15 +31,15 @@ public class BoardService {
         return repository.selectBoardList();
     }
 
-    public int insertBoard(Board board) {
+    private int insertBoard(Board board) {
         return repository.insertBoard(board);
     }
 
-    public int updateBoard(Board board) {
+    private int updateBoard(Board board) {
         return repository.updateBoard(board);
     }
 
-    public int deleteBoardById(int boardId) {
+    private int deleteBoardById(int boardId) {
         return repository.deleteBoardById(boardId);
     }
 
@@ -48,19 +48,19 @@ public class BoardService {
         return repository.selectTagByName(tag);
     }
 
-    public int insertTag(Tag tag) {
+    private int insertTag(Tag tag) {
         return repository.insertTag(tag);
     }
 
-    public int updateTag(Tag tag) {
+    private int updateTag(Tag tag) {
         return repository.updateTag(tag);
     }
 
-    public int insertBoardTagRel(BoardTag boardTag) {
+    private int insertBoardTagRel(BoardTag boardTag) {
         return repository.insertBoardTagRel(boardTag);
     }
 
-    public int deleteBoardTagRelByBoardId(BoardTag boardTag) {
+    private int deleteBoardTagRelByBoardId(BoardTag boardTag) {
         return repository.deleteBoardTagRelByBoardId(boardTag);
     }
 
