@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users
 (
-    user_id                   VARCHAR2(20)    PRIMARY KEY,
+    user_id                   VARCHAR2(15)    PRIMARY KEY,
     password                  VARCHAR2(100)   NOT NULL,
     name                      VARCHAR2(15)    NOT NULL,
     nick                      VARCHAR2(15)    NOT NULL,
@@ -11,9 +11,9 @@ CREATE TABLE users
     email_addr                VARCHAR2(100)   NOT NULL,
     del_yn                    BOOLEAN         NOT NULL        DEFAULT FALSE,
     frst_reg_user_id          VARCHAR2(15)    NOT NULL,
-    frst_reg_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    frst_reg_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
     last_upd_user_id          VARCHAR2(15)    NOT NULL,
-    last_upd_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP
+    last_upd_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO users
@@ -47,10 +47,10 @@ CREATE TABLE board
   del_yn                    BOOLEAN         NOT NULL        DEFAULT FALSE,
   frst_reg_user_id          VARCHAR2(15)    NOT NULL,
   frst_reg_user_ip_addr     VARCHAR2(15),
-  frst_reg_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+  frst_reg_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
   last_upd_user_id          VARCHAR2(15)    NOT NULL,
   last_upd_user_ip_addr     VARCHAR2(15),
-  last_upd_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP
+  last_upd_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO board
@@ -84,10 +84,10 @@ CREATE TABLE tags
     del_yn                    BOOLEAN         NOT NULL        DEFAULT FALSE,
     frst_reg_user_id          VARCHAR2(15)    NOT NULL,
     frst_reg_user_ip_addr     VARCHAR2(15),
-    frst_reg_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    frst_reg_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
     last_upd_user_id          VARCHAR2(15)    NOT NULL,
     last_upd_user_ip_addr     VARCHAR2(15),
-    last_upd_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP
+    last_upd_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS board_tag_relation;
@@ -98,9 +98,9 @@ CREATE TABLE board_tag_relation
     tag_id                    INT,
     frst_reg_user_id          VARCHAR2(15)    NOT NULL,
     frst_reg_user_ip_addr     VARCHAR2(15),
-    frst_reg_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    frst_reg_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
     last_upd_user_id          VARCHAR2(15)    NOT NULL,
     last_upd_user_ip_addr     VARCHAR2(15),
-    last_upd_dttm             DATETIME            NOT NULL        DEFAULT CURRENT_TIMESTAMP,
+    last_upd_dttm             DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (board_id, tag_id)
 );
