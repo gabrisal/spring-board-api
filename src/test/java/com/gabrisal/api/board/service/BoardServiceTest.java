@@ -5,7 +5,6 @@ import com.gabrisal.api.board.dto.SearchBoardIn;
 import com.gabrisal.api.board.dto.SearchBoardOut;
 import com.gabrisal.api.board.model.Board;
 import com.gabrisal.api.board.repository.BoardRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -37,7 +38,7 @@ class BoardServiceTest {
         final List<SearchBoardOut> boardList = service.getBoardList();
 
         // then
-        Assertions.assertThat(boardList.size()).isEqualTo(5);
+        assertThat(boardList.size()).isEqualTo(5);
     }
 
 
@@ -54,7 +55,7 @@ class BoardServiceTest {
         SearchBoardOut result = service.getBoardById(searchBoardIn);
 
         // then
-        Assertions.assertThat(result.getBoardId()).isEqualTo(board.getBoardId());
+        assertThat(result.getBoardId()).isEqualTo(board.getBoardId());
     }
 
     @DisplayName("게시판_글_작성")
@@ -70,7 +71,7 @@ class BoardServiceTest {
         int result =service.saveBoard(board);
 
         // then
-        Assertions.assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1);
     }
 
     @DisplayName("게시판_글_수정")
@@ -90,7 +91,7 @@ class BoardServiceTest {
         int result = service.modifyBoard(modifyBoard);
 
         // then
-        Assertions.assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1);
     }
 
     @DisplayName("게시판_글_삭제")
@@ -107,7 +108,7 @@ class BoardServiceTest {
         int result = service.deleteBoard(deleteBoard);
 
         // then
-        Assertions.assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1);
     }
 
     private Board createBoard() {
