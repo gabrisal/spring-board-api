@@ -1,4 +1,4 @@
-package com.gabrisal.api.common;
+package com.gabrisal.api.common.exception;
 
 import lombok.Data;
 
