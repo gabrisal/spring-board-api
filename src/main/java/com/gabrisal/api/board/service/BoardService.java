@@ -7,6 +7,7 @@ import com.gabrisal.api.board.model.Board;
 import com.gabrisal.api.board.model.BoardTag;
 import com.gabrisal.api.board.model.Tag;
 import com.gabrisal.api.board.repository.BoardRepository;
+import com.gabrisal.api.common.util.MaskingUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,10 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<SearchBoardOut> getBoardList() {
-        return repository.selectBoardList();
+        // XXX : map 은 왜 안될까
+        List<SearchBoardOut> boardList = repository.selectBoardList();
+        boardList.forEach(v -> v.setWriter(MaskingUtil.getMaskedName(v.getWriter())));
+        return boardList;
     }
 
     private int insertBoard(Board board) {
