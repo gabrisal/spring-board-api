@@ -17,8 +17,7 @@ public class MaskingUtil {
     public static String getMaskedName(String name) {
         if (StringUtils.isEmpty(name)) { return name; }
         if (name.length() > 2) {
-            // XXX : 가운데 마스킹 정규식은 없는 걸까
-            return name.substring(0, 1) + MASKING_CHARACTER.repeat(name.length() - 2) + name.substring(name.length() - 1);
+            return name.replaceAll("(?<=.{1}).(?=.{1})", MASKING_CHARACTER);
         }
         return name.replaceAll("(?<=.{1}).", MASKING_CHARACTER);
     }
