@@ -8,11 +8,17 @@ import com.gabrisal.api.board.model.BoardTag;
 import com.gabrisal.api.board.model.Tag;
 import com.gabrisal.api.board.repository.BoardRepository;
 import com.gabrisal.api.common.util.MaskingUtil;
+import com.gabrisal.api.mail.service.MailService;
+import com.gabrisal.api.mail.vo.SendMailInfo;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,6 +27,8 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository repository;
+    private final MailService mailService;
+    private final String RECEIVER_MAIL = "upskilling@bbubbush.com";
 
     @Transactional(readOnly = true)
     public SearchBoardOut getBoardById(SearchBoardIn in) {
@@ -130,11 +138,44 @@ public class BoardService {
     }
 
     public int deleteBoard(SearchBoardIn board) {
+        mailService.sendMail(createMailInfoForBoard(board));
         int result = deleteBoardById(board.getBoardId());
         BoardTag boardTag = BoardTag.builder()
                 .boardId(board.getBoardId())
                 .build();
         deleteBoardTagRelByBoardId(boardTag);
         return result;
+    }
+
+    /**
+     * 게시글 정보 이메일 발송 내용 생성
+     *
+     * 게시글이 삭제되는 경우, 삭제될 게시글 정보를 이메일로 발송하기위해 메일 세팅 정보를 생성한다.
+     * @param board
+     * @return SendMailInfo
+     */
+    private SendMailInfo createMailInfoForBoard(SearchBoardIn board) {
+        // TODO: 게시글 정보가 존재하지않는 경우 예외처리
+        SearchBoardOut boardInfo = getBoardById(board);
+        // 메일 수신자
+        // TODO: 관리자 이메일 조회 기능 추가
+        List<String> receiverMailList = new ArrayList<>();
+        receiverMailList.add(RECEIVER_MAIL);
+        // 메일 제목
+        StringBuilder subject = new StringBuilder();
+        subject.append("[게시글 삭제]\"");
+        subject.append(boardInfo.getBoardTitle());
+        subject.append("\"이(가) 삭제 되었습니다.");
+        // 메일 내용
+        DateTime dateTime = new DateTime();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        StringBuilder content = new StringBuilder();
+        content.append(dateTime.toString(dateTimeFormatter));
+        content.append(" 에 해당 게시글이 삭제되었습니다.");
+        return SendMailInfo.builder()
+                            .receiverMailList(receiverMailList)
+                            .subject(subject.toString())
+                            .content(content.toString())
+                            .build();
     }
 }
