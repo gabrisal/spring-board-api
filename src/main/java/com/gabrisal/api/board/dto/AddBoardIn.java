@@ -28,7 +28,8 @@ public class AddBoardIn {
     private String boardTitle;
 
     @NotBlank(groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
-    @Size(max = 200)
+    @Size(max = 200
+        , groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Schema(description = "게시글 내용", required = true, example = "내용")
     private String boardContent;
 
@@ -36,7 +37,8 @@ public class AddBoardIn {
     @Schema(description = "등록한 사용자 ID", required = true, example = "gabrisal")
     private String regUserId;
 
-    @Size(max = 5)
+    @Size(max = 5
+        , groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Schema(description = "태그 목록", required = false)
     private List<Tag> tagList;
 
