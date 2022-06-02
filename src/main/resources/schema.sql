@@ -27,15 +27,15 @@ INSERT INTO users
 , frst_reg_user_id
 , last_upd_user_id )
 VALUES
-    ('gbrisal'
+    ('gabrisal'
     , 'password1!'
     , '김지영'
     , '착한사람'
     , '19940806'
     , '2'
     , 'jy942013@naver.com'
-    , 'gbrisal'
-    , 'gbrisal');
+    , 'gabrisal'
+    , 'gabrisal');
 
 DROP TABLE IF EXISTS board;
 
@@ -61,8 +61,8 @@ INSERT INTO board
 VALUES
     ('테스트'
     , '내용'
-    , 'gbrisal'
-    , 'gbrisal');
+    , 'gabrisal'
+    , 'gabrisal');
 
 INSERT INTO board
 ( board_title
@@ -72,8 +72,8 @@ INSERT INTO board
 VALUES
     ('테스트2'
     , '내용2'
-    , 'gbrisal'
-    , 'gbrisal');
+    , 'gabrisal'
+    , 'gabrisal');
 
 DROP TABLE IF EXISTS tags;
 
