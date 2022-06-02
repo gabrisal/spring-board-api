@@ -50,9 +50,7 @@ class BoardServiceTest {
         repository.insertBoard(board);
 
         // when
-        SearchBoardIn searchBoardIn = new SearchBoardIn();
-        searchBoardIn.setBoardId(board.getBoardId());
-        SearchBoardOut result = service.getBoardById(searchBoardIn);
+        SearchBoardOut result = service.getBoardById(board.getBoardId());
 
         // then
         assertThat(result.getBoardId()).isEqualTo(board.getBoardId());

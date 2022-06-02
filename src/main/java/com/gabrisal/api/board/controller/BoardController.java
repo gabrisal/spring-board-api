@@ -33,10 +33,10 @@ public class BoardController {
     }
 
     @ApiOperation(value = "게시판 단건 조회", notes = "게시판 ID로 게시글 정보를 조회한다.")
-    @GetMapping("/one")
-    public ResponseEntity<ResponseMessage> getBoardById(@RequestBody SearchBoardIn in) {
+    @GetMapping("/one/{boardId}")
+    public ResponseEntity<ResponseMessage> getBoardById(@PathVariable int boardId) {
         ResponseMessage resMsg = new ResponseMessage();
-        resMsg.setData(service.getBoardById(in));
+        resMsg.setData(service.getBoardById(boardId));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
         resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());
         return ResponseEntity.ok(resMsg);

@@ -31,7 +31,8 @@ public class BoardService {
     private final String RECEIVER_MAIL = "upskilling@bbubbush.com";
 
     @Transactional(readOnly = true)
-    public SearchBoardOut getBoardById(SearchBoardIn in) {
+    public SearchBoardOut getBoardById(int boardId) {
+        SearchBoardIn in = SearchBoardIn.builder().boardId(boardId).build();
         return repository.selectBoardOne(in);
     }
 
@@ -156,7 +157,7 @@ public class BoardService {
      */
     private SendMailInfo createMailInfoForBoard(SearchBoardIn board) {
         // TODO: 게시글 정보가 존재하지않는 경우 예외처리
-        SearchBoardOut boardInfo = getBoardById(board);
+        SearchBoardOut boardInfo = getBoardById(board.getBoardId());
         // 메일 수신자
         // TODO: 관리자 이메일 조회 기능 추가
         List<String> receiverMailList = new ArrayList<>();
