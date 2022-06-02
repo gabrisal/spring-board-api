@@ -5,10 +5,16 @@ import com.gabrisal.api.board.dto.SearchBoardIn;
 import com.gabrisal.api.board.service.BoardService;
 import com.gabrisal.api.common.exception.ResponseMessage;
 import com.gabrisal.api.common.exception.StatusEnum;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags = "Board API - 게시판 관리 API")
+@ApiResponses({
+    @ApiResponse(code = 200, message = "정상")
+    , @ApiResponse(code = 500, message = "시스템 오류")
+})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/board")
@@ -16,6 +22,7 @@ public class BoardController {
 
     private final BoardService service;
 
+    @ApiOperation(value = "게시판 다건 조회", notes = "게시판 전체 목록을 조회한다.")
     @GetMapping("/list")
     public ResponseEntity<ResponseMessage> getBoardList() {
         ResponseMessage resMsg = new ResponseMessage();
@@ -25,6 +32,7 @@ public class BoardController {
         return ResponseEntity.ok(resMsg);
     }
 
+    @ApiOperation(value = "게시판 단건 조회", notes = "게시판 ID로 게시글 정보를 조회한다.")
     @GetMapping("/one")
     public ResponseEntity<ResponseMessage> getBoardById(@RequestBody SearchBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
@@ -34,6 +42,7 @@ public class BoardController {
         return ResponseEntity.ok(resMsg);
     }
 
+    @ApiOperation(value = "게시글 등록", notes = "게시글 한 건을 등록한다.")
     @PostMapping("/add")
     public ResponseEntity<ResponseMessage> saveBoard(@RequestBody AddBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
@@ -43,6 +52,7 @@ public class BoardController {
         return ResponseEntity.ok(resMsg);
     }
 
+    @ApiOperation(value = "게시글 수정", notes = "게시글 한 건을 수정한다.")
     @PutMapping("/update")
     public ResponseEntity<ResponseMessage> modifyBoard(@RequestBody AddBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
@@ -52,6 +62,7 @@ public class BoardController {
         return ResponseEntity.ok(resMsg);
     }
 
+    @ApiOperation(value = "게시글 삭제", notes = "게시판 ID로 게시글을 삭제한다.")
     @DeleteMapping("/delete")
     public ResponseEntity<ResponseMessage> deleteBoard(@RequestBody SearchBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
