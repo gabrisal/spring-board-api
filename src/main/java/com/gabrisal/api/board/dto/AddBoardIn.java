@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "게시판 등록/수정 요청")
@@ -17,9 +19,12 @@ public class AddBoardIn {
     @Schema(description = "게시글 ID", required = false, example = "1")
     private int boardId;
 
+    @NotEmpty
     @Schema(description = "게시글 제목", required = true, example = "제목")
     private String boardTitle;
 
+    @NotEmpty
+    @Size(max = 200)
     @Schema(description = "게시글 내용", required = true, example = "내용")
     private String boardContent;
 

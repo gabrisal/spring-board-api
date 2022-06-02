@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Api(tags = "Board API - 게시판 관리 API")
 @ApiResponses({
     @ApiResponse(code = 200, message = "정상")
@@ -41,7 +43,7 @@ public class BoardController {
             , paramType = "path"
             , defaultValue = "None")
     @GetMapping("/one/{boardId}")
-    public ResponseEntity<ResponseMessage> getBoardById(@PathVariable int boardId) {
+    public ResponseEntity<ResponseMessage> getBoardById(@PathVariable @Valid int boardId) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.getBoardById(boardId));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
@@ -51,7 +53,7 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 등록", notes = "게시글 한 건을 등록한다.")
     @PostMapping("/add")
-    public ResponseEntity<ResponseMessage> saveBoard(@RequestBody AddBoardIn in) {
+    public ResponseEntity<ResponseMessage> saveBoard(@RequestBody @Valid AddBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.saveBoard(in));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
