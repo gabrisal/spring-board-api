@@ -24,4 +24,6 @@ public class ApiExceptionHandler {
         resMsg.setErrMsg(StatusEnum.SERVER_ERROR.getStatusValue());
         return ResponseEntity.badRequest().body(resMsg);
     }
+
+
 }

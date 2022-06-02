@@ -5,9 +5,11 @@ import com.gabrisal.api.board.dto.SearchBoardIn;
 import com.gabrisal.api.board.service.BoardService;
 import com.gabrisal.api.common.exception.ResponseMessage;
 import com.gabrisal.api.common.exception.StatusEnum;
+import com.gabrisal.api.common.validation.ValidationGroups;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,7 +55,7 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 등록", notes = "게시글 한 건을 등록한다.")
     @PostMapping("/add")
-    public ResponseEntity<ResponseMessage> saveBoard(@RequestBody @Valid AddBoardIn in) {
+    public ResponseEntity<ResponseMessage> saveBoard(@RequestBody @Validated(ValidationGroups.createBoardGroup.class) AddBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.saveBoard(in));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
@@ -63,7 +65,7 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 수정", notes = "게시글 한 건을 수정한다.")
     @PutMapping("/update")
-    public ResponseEntity<ResponseMessage> modifyBoard(@RequestBody AddBoardIn in) {
+    public ResponseEntity<ResponseMessage> modifyBoard(@RequestBody @Validated(ValidationGroups.modifyBoardGroup.class) AddBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.modifyBoard(in));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());

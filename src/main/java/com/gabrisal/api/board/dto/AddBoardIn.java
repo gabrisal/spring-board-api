@@ -1,12 +1,14 @@
 package com.gabrisal.api.board.dto;
 
 import com.gabrisal.api.board.model.Tag;
+import com.gabrisal.api.common.validation.ValidationGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -16,21 +18,25 @@ import java.util.List;
 @NoArgsConstructor
 public class AddBoardIn {
 
+    @Positive(groups = ValidationGroups.modifyBoardGroup.class)
     @Schema(description = "게시글 ID", required = false, example = "1")
     private int boardId;
 
-    @NotEmpty
+    // XXX: 공통으로 모두 적용하고 특이케이스만 지정할 순 없을까?
+    @NotBlank(groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Schema(description = "게시글 제목", required = true, example = "제목")
     private String boardTitle;
 
-    @NotEmpty
+    @NotBlank(groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Size(max = 200)
     @Schema(description = "게시글 내용", required = true, example = "내용")
     private String boardContent;
 
+    @NotBlank(groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Schema(description = "등록한 사용자 ID", required = true, example = "gabrisal")
     private String regUserId;
 
+    @Size(max = 5)
     @Schema(description = "태그 목록", required = false)
     private List<Tag> tagList;
 
