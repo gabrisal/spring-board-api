@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -43,6 +44,7 @@ public class AddBoardIn {
     @Size(max = 5
         , groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     @Schema(description = "태그 목록")
+    @UniqueElements(groups = { ValidationGroups.createBoardGroup.class, ValidationGroups.modifyBoardGroup.class })
     private List<Tag> tagList;
 
 }
