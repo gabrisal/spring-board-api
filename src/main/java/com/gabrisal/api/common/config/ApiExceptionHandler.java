@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -40,6 +40,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
         resMsg.setErrMsg(StatusEnum.SERVER_ERROR.getStatusValue());
+        return ResponseEntity.badRequest().body(resMsg);
+    }
+
+    @ExceptionHandler({ ConstraintViolationException.class })
+    public ResponseEntity<Object> handleMissingPathVariable(final ConstraintViolationException ex) {
+        log.error("::::::::::handleMissingPathVariable::::::::::::::");
+        ResponseMessage resMsg = new ResponseMessage();
+        List<String> errMsg = ex.getConstraintViolations()
+                .stream()
+                        .map(ConstraintViolation::getMessage)
+                                .collect(Collectors.toList());
+        // TODO: Valid 별 에러코드 분기
+        resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
+        resMsg.setErrMsg(errMsg.get(0).toString());
         return ResponseEntity.badRequest().body(resMsg);
     }
 
