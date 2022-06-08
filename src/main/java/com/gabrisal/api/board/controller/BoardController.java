@@ -13,12 +13,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @Api(tags = "Board API - 게시판 관리 API")
 @ApiResponses({
     @ApiResponse(code = 200, message = "정상")
     , @ApiResponse(code = 500, message = "시스템 오류")
 })
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/board")
@@ -45,7 +47,7 @@ public class BoardController {
             , paramType = "path"
             , defaultValue = "None")
     @GetMapping("/one/{boardId}")
-    public ResponseEntity<ResponseMessage> getBoardById(@PathVariable @Valid int boardId) {
+    public ResponseEntity<ResponseMessage> getBoardById(@PathVariable @Positive int boardId) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.getBoardById(boardId));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
@@ -75,7 +77,7 @@ public class BoardController {
 
     @ApiOperation(value = "게시글 삭제", notes = "게시판 ID로 게시글을 삭제한다.")
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseMessage> deleteBoard(@RequestBody SearchBoardIn in) {
+    public ResponseEntity<ResponseMessage> deleteBoard(@RequestBody @Valid SearchBoardIn in) {
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setData(service.deleteBoard(in));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
