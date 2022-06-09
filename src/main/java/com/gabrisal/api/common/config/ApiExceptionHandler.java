@@ -10,6 +10,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,8 +20,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -47,20 +50,25 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMissingPathVariable(final ConstraintViolationException ex) {
         log.error("::::::::::handleMissingPathVariable::::::::::::::");
         ResponseMessage resMsg = new ResponseMessage();
-        List<String> errMsg = ex.getConstraintViolations()
+        String errMsg = ex.getConstraintViolations()
                 .stream()
-                        .map(ConstraintViolation::getMessage)
-                                .collect(Collectors.toList());
+                .map(ConstraintViolation::getMessage)
+                .findFirst().toString();
         // TODO: Valid 별 에러코드 분기
         resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
-        resMsg.setErrMsg(errMsg.get(0).toString());
+        resMsg.setErrMsg(errMsg);
         return ResponseEntity.badRequest().body(resMsg);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return ResponseEntity.badRequest().body(getBindErrorResponse(ex.getBindingResult()));
+    }
+
+    private ResponseMessage getBindErrorResponse(BindingResult bindingResult) {
         ResponseMessage resMsg = new ResponseMessage();
-        List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
+        List<ObjectError> allErrors = bindingResult.getAllErrors();
+
         for (ObjectError err : allErrors) {
             log.error("[ERROR] ::: {}", err);
             log.error("[ERROR] getCodes ::: {}", Arrays.toString(err.getCodes()));
@@ -76,14 +84,29 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                     }).filter(Objects::nonNull)
                     .findFirst()
                     .orElse(err.getDefaultMessage());
-            log.error("[ERROR] message: {}", message);
-            // TODO: Valid 별 에러코드 분기
+
+            log.error("[ERROR] errCode: {}", bindingResult.getFieldError().getCode());
+            log.error("[ERROR] errMsg: {}", message);
+
             // XXX: getAllErrors 순서 확인
-            resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
+            // TODO: 동일한 어노테이션 다른 응답코드 처리
+            switch (bindingResult.getFieldError().getCode()) {
+                case "NotBlank":
+                    resMsg.setErrCode(StatusEnum.INVALID_EMPTY_DATA.getStatusCode());
+                    break;
+                case "Size":
+                    resMsg.setErrCode(StatusEnum.INVALID_SIZE_DATA.getStatusCode());
+                    break;
+                case "UniqueElements":
+                    resMsg.setErrCode(StatusEnum.INVALID_DUPLICATED_DATA.getStatusCode());
+                    break;
+                default:
+                    resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
+            }
             resMsg.setErrMsg(message);
-            return ResponseEntity.badRequest().body(resMsg);
         }
-        return super.handleMethodArgumentNotValid(ex, headers, status, request);
+
+        return resMsg;
     }
 
 }
