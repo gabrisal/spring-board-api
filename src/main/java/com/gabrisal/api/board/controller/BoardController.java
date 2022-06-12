@@ -13,9 +13,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -97,6 +99,28 @@ public class BoardController {
         resMsg.setData(service.deleteBoard(in));
         resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
         resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());
+        return ResponseEntity.ok(resMsg);
+    }
+
+    @Operation(summary = "게시글 엑셀 업로드", description = "게시글을 엑셀업로드로 등록한다.", tags = "board")
+    @PostMapping(value = "/upload/excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> saveBoardByUploadExcel(@RequestPart("uploadFile") MultipartFile excelFile) {
+        ResponseMessage resMsg = new ResponseMessage();
+
+        try {
+//            MultipartFile excelFile = in.getUploadFile();
+            if (excelFile == null || excelFile.isEmpty()) {
+                throw new RuntimeException("엑셀파일을 등록해 주세요.");
+            }
+            // XXX: 등록 and 실패 모두 발생할 경우? / 등록, 실패 에러코드 분기
+            resMsg.setData(service.saveBoardByUploadExcel(excelFile));
+            resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
+            resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());
+        } catch (Exception e) {
+            resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
+            resMsg.setErrMsg(StatusEnum.SERVER_ERROR.getStatusValue());
+        }
+
         return ResponseEntity.ok(resMsg);
     }
 }

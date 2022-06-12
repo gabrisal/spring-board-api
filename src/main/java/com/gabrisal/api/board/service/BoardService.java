@@ -11,12 +11,20 @@ import com.gabrisal.api.common.util.MaskingUtil;
 import com.gabrisal.api.mail.service.MailService;
 import com.gabrisal.api.mail.vo.SendMailInfo;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +37,8 @@ public class BoardService {
     private final BoardRepository repository;
     private final MailService mailService;
     private final String RECEIVER_MAIL = "upskilling@bbubbush.com";
+    @Value("${file.upload.path}")
+    private String UPLOAD_FILE_PATH;
 
     @Transactional(readOnly = true)
     public SearchBoardOut getBoardById(int boardId) {
@@ -178,5 +188,58 @@ public class BoardService {
                             .subject(subject.toString())
                             .content(content.toString())
                             .build();
+    }
+
+    /**
+     * 엑셀 업로드로 게시글 등록
+     *
+     * 게시글 등록에 실패한 경우, 관리자에게 이메일을 보낸다.
+     * @param excelFile
+     * @return count
+     */
+    public int saveBoardByUploadExcel(MultipartFile excelFile) throws Exception {
+        int successCount = 0;
+        int failCount = 0;
+//        String filePath = UPLOAD_FILE_PATH + "//" + excelFile.getOriginalFilename();
+        OPCPackage opcPackage = OPCPackage.open(excelFile.getInputStream());
+        XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        for (int i = 2; i < sheet.getLastRowNum() + 1; i++) {
+            try {
+                XSSFRow row = sheet.getRow(i);
+                XSSFCell cell = null;
+
+                if (row == null)
+                    continue;
+
+                // 엑셀 데이터로 게시글 정보 세팅
+                String title = row.getCell(0).getStringCellValue();
+                String content = row.getCell(1).getStringCellValue();
+                String writer = row.getCell(2).getStringCellValue();
+                String tags = row.getCell(3).getStringCellValue();
+                List<Tag> tagList = new ArrayList<>();
+                if (!StringUtils.isEmpty(tags)) {
+                    for (String tag: tags.split(",")){
+                        Tag tagInfo = Tag.builder()
+                                .tagName(tag)
+                                .build();
+                        tagList.add(tagInfo);
+                    }
+                }
+                AddBoardIn boardIn = AddBoardIn.builder()
+                        .boardTitle(title)
+                        .boardContent(content)
+                        .regUserId(writer)
+                        .tagList(tagList)
+                        .build();
+                // 게시판 정보 저장
+                // TODO: 성공/실패 건 처리
+                successCount += saveBoard(boardIn);
+            } catch (Exception ex) {
+                failCount++;
+            }
+        }
+
+        return successCount;
     }
 }

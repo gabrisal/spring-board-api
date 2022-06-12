@@ -49,6 +49,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ ConstraintViolationException.class })
     public ResponseEntity<Object> handleMissingPathVariable(final ConstraintViolationException ex) {
         log.error("::::::::::handleMissingPathVariable::::::::::::::");
+        String eee = ex.getConstraintViolations().stream().map(ConstraintViolation::toString).toString();
         ResponseMessage resMsg = new ResponseMessage();
         String errMsg = ex.getConstraintViolations()
                 .stream()

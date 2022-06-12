@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.gabrisal.api.board.model.Tag;
 import com.gabrisal.api.common.validation.ValidationGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.validation.constraints.NotBlank;
@@ -16,8 +14,10 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "게시판 등록/수정 요청")
-@Getter @Setter
+@Builder
+@Getter @Setter @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class AddBoardIn {
 
     @Positive(groups = ValidationGroups.modifyBoardGroup.class)
