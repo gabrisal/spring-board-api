@@ -26,7 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -204,7 +207,7 @@ public class BoardService {
         OPCPackage opcPackage = OPCPackage.open(excelFile.getInputStream());
         XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
         XSSFSheet sheet = workbook.getSheetAt(0);
-        for (int i = 2; i < sheet.getLastRowNum() + 1; i++) {
+        for (int i=2; i<sheet.getLastRowNum() + 1; i++) {
             try {
                 XSSFRow row = sheet.getRow(i);
                 XSSFCell cell = null;
@@ -241,5 +244,50 @@ public class BoardService {
         }
 
         return successCount;
+    }
+
+
+    /**
+     * 엑셀 다운로드
+     *
+     * @return excelFile
+     */
+    public void getBoadListByExcel(HttpServletResponse response) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet();
+        XSSFRow row = null;
+        XSSFCell cell = null;
+        int rowNum = 0;
+
+        // 엑셀 헤더
+        List<String> header = Arrays.asList("게시글ID", "제목", "내용", "작성자", "태그");
+        row = sheet.createRow(rowNum++);
+        for (int i=0; i<header.size(); i++) {
+            cell = row.createCell(i);
+            cell.setCellValue(header.get(i));
+        }
+
+        // 엑셀 다운로드 할 데이터
+        List<SearchBoardOut> boardList = getBoardList();
+        for (int i=0; i<boardList.size(); i++) {
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue(boardList.get(i).getBoardId());
+            cell = row.createCell(1);
+            cell.setCellValue(boardList.get(i).getBoardTitle());
+            cell = row.createCell(2);
+            cell.setCellValue(boardList.get(i).getBoardContent());
+            cell = row.createCell(3);
+            cell.setCellValue(boardList.get(i).getWriter());
+            cell = row.createCell(4);
+            cell.setCellValue(boardList.get(i).getTags());
+        }
+
+        String fileName = "게시글목록조회";
+        String outputFileName = new String(fileName.getBytes("KSC5601"), "8859_1");
+        response.setHeader("Content-Disposition", "attachment;filename=" + outputFileName + ".xlsx");
+        response.setContentType("ms-vnd/excel");
+        workbook.write(response.getOutputStream());
+        response.getOutputStream().close();
     }
 }

@@ -19,8 +19,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 
 @Tag(name = "board", description = "게시판 관리 API")
 @Validated
@@ -114,6 +116,23 @@ public class BoardController {
             }
             // XXX: 등록 and 실패 모두 발생할 경우? / 등록, 실패 에러코드 분기
             resMsg.setData(service.saveBoardByUploadExcel(excelFile));
+            resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
+            resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());
+        } catch (Exception e) {
+            resMsg.setErrCode(StatusEnum.SERVER_ERROR.getStatusCode());
+            resMsg.setErrMsg(StatusEnum.SERVER_ERROR.getStatusValue());
+        }
+
+        return ResponseEntity.ok(resMsg);
+    }
+
+    @Operation(summary = "게시글 엑셀 다운로드", description = "게시글 전체 목록을 엑셀파일로 다운로드한다.", tags = "board")
+    @GetMapping("/download/excel")
+    public ResponseEntity<ResponseMessage> getBoadListByExcel(HttpServletResponse response) {
+        ResponseMessage resMsg = new ResponseMessage();
+
+        try {
+            service.getBoadListByExcel(response);
             resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
             resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());
         } catch (Exception e) {
