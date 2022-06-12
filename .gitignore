@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### private info ###
-application.properties
+application.yml
