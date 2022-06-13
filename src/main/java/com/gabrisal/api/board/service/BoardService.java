@@ -207,7 +207,8 @@ public class BoardService {
         OPCPackage opcPackage = OPCPackage.open(excelFile.getInputStream());
         XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
         XSSFSheet sheet = workbook.getSheetAt(0);
-        for (int i=2; i<sheet.getLastRowNum() + 1; i++) {
+
+        for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
             try {
                 XSSFRow row = sheet.getRow(i);
                 XSSFCell cell = null;
@@ -216,25 +217,34 @@ public class BoardService {
                     continue;
 
                 // 엑셀 데이터로 게시글 정보 세팅
-                String title = row.getCell(0).getStringCellValue();
-                String content = row.getCell(1).getStringCellValue();
-                String writer = row.getCell(2).getStringCellValue();
-                String tags = row.getCell(3).getStringCellValue();
-                List<Tag> tagList = new ArrayList<>();
-                if (!StringUtils.isEmpty(tags)) {
-                    for (String tag: tags.split(",")){
-                        Tag tagInfo = Tag.builder()
-                                .tagName(tag)
-                                .build();
-                        tagList.add(tagInfo);
-                    }
+                // XXX: 이게 맞냐..?
+                AddBoardIn boardIn = new AddBoardIn();
+                cell = row.getCell(0);
+                if (cell != null) {
+                    boardIn.setBoardTitle(cell.getStringCellValue());
                 }
-                AddBoardIn boardIn = AddBoardIn.builder()
-                        .boardTitle(title)
-                        .boardContent(content)
-                        .regUserId(writer)
-                        .tagList(tagList)
-                        .build();
+                cell = row.getCell(1);
+                if (cell != null) {
+                    boardIn.setBoardContent(cell.getStringCellValue());
+                }
+                cell = row.getCell(2);
+                if (cell != null) {
+                    boardIn.setRegUserId(cell.getStringCellValue());
+                }
+                cell = row.getCell(3);
+                if (cell != null) {
+                    String tags = row.getCell(3).getStringCellValue();
+                    List<Tag> tagList = new ArrayList<>();
+                    if (!StringUtils.isEmpty(row.getCell(3).getStringCellValue())) {
+                        for (String tag: tags.split(",")){
+                            Tag tagInfo = Tag.builder()
+                                    .tagName(tag)
+                                    .build();
+                            tagList.add(tagInfo);
+                        }
+                    }
+                    boardIn.setTagList(tagList);
+                }
                 // 게시판 정보 저장
                 // TODO: 성공/실패 건 처리
                 successCount += saveBoard(boardIn);
