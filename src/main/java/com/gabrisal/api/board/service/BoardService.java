@@ -203,12 +203,14 @@ public class BoardService {
     public int saveBoardByUploadExcel(MultipartFile excelFile) throws Exception {
         int successCount = 0;
         int failCount = 0;
+        List<AddBoardIn> failList = new ArrayList<>();
 //        String filePath = UPLOAD_FILE_PATH + "//" + excelFile.getOriginalFilename();
         OPCPackage opcPackage = OPCPackage.open(excelFile.getInputStream());
         XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
         XSSFSheet sheet = workbook.getSheetAt(0);
 
         for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
+            AddBoardIn boardIn = new AddBoardIn();
             try {
                 XSSFRow row = sheet.getRow(i);
                 XSSFCell cell = null;
@@ -218,7 +220,6 @@ public class BoardService {
 
                 // 엑셀 데이터로 게시글 정보 세팅
                 // XXX: 이게 맞냐..?
-                AddBoardIn boardIn = new AddBoardIn();
                 cell = row.getCell(0);
                 if (cell != null) {
                     boardIn.setBoardTitle(cell.getStringCellValue());
@@ -246,16 +247,56 @@ public class BoardService {
                     boardIn.setTagList(tagList);
                 }
                 // 게시판 정보 저장
-                // TODO: 성공/실패 건 처리
                 successCount += saveBoard(boardIn);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 failCount++;
+                failList.add(boardIn);
             }
+        }
+
+        if (!failList.isEmpty()) {
+            mailService.sendMail(createMailInfoForBoard(failList));
         }
 
         return successCount;
     }
 
+    /**
+     * 게시글 정보 이메일 발송 내용 생성
+     *
+     * 엑셀업로드로 게시글 등록이 실패할 경우, 등록 실패한 게시글 정보를 이메일로 발송하기위해 메일 세팅 정보를 생성한다.
+     * @param boardInfo
+     * @return SendMailInfo
+     */
+    private SendMailInfo createMailInfoForBoard(List<AddBoardIn> boardInfo) {
+        // 메일 수신자
+        // TODO: 관리자 이메일 조회 기능 추가
+        List<String> receiverMailList = new ArrayList<>();
+        receiverMailList.add(RECEIVER_MAIL);
+        // 메일 제목
+        StringBuilder subject = new StringBuilder();
+        subject.append("[게시글 등록 실패] 엑셀업로드 게시물 등록에 실패하였습니다.");
+
+        // 메일 내용
+        StringBuilder content = new StringBuilder();
+        for (AddBoardIn failInfo: boardInfo) {
+            content.append("[게시글 제목]");
+            content.append(failInfo.getBoardTitle());
+            content.append("\n[게시글 내용]");
+            content.append(failInfo.getBoardContent());
+            content.append("\n[게시글 작성자]");
+            content.append(failInfo.getRegUserId());
+            content.append("\n[게시글 태그]");
+            content.append(failInfo.getTagList());
+            content.append("\n\n");
+        }
+        return SendMailInfo.builder()
+                .receiverMailList(receiverMailList)
+                .subject(subject.toString())
+                .content(content.toString())
+                .build();
+    }
 
     /**
      * 엑셀 다운로드
