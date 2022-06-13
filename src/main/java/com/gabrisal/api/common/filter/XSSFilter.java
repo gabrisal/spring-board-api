@@ -19,7 +19,13 @@ public class XSSFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("********* filter doFilter **********");
-        chain.doFilter(new XSSRequestWrapper((HttpServletRequest) request), response);
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        if (httpRequest.getMethod().equalsIgnoreCase("POST")
+                && httpRequest.getContentType().startsWith("multipart/form-data")) {
+           chain.doFilter(request, response);
+        } else {
+            chain.doFilter(new XSSRequestWrapper((HttpServletRequest) request), response);
+        }
     }
 
     @Override
