@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.io.IOException;
 
 @Tag(name = "board", description = "게시판 관리 API")
 @Validated
@@ -110,11 +109,9 @@ public class BoardController {
         ResponseMessage resMsg = new ResponseMessage();
 
         try {
-//            MultipartFile excelFile = in.getUploadFile();
-            if (excelFile == null || excelFile.isEmpty()) {
+            if (excelFile == null || excelFile.isEmpty() || !excelFile.getOriginalFilename().endsWith("xlsx")) {
                 throw new RuntimeException("엑셀파일을 등록해 주세요.");
             }
-            // XXX: 등록 and 실패 모두 발생할 경우? / 등록, 실패 에러코드 분기
             resMsg.setData(service.saveBoardByUploadExcel(excelFile));
             resMsg.setErrCode(StatusEnum.SUCCESS.getStatusCode());
             resMsg.setErrMsg(StatusEnum.SUCCESS.getStatusValue());

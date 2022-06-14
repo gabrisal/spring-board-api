@@ -7,12 +7,13 @@ import com.gabrisal.api.board.model.Board;
 import com.gabrisal.api.board.model.BoardTag;
 import com.gabrisal.api.board.model.Tag;
 import com.gabrisal.api.board.repository.BoardRepository;
+import com.gabrisal.api.common.util.ExcelSheetHandler;
 import com.gabrisal.api.common.util.MaskingUtil;
 import com.gabrisal.api.mail.service.MailService;
 import com.gabrisal.api.mail.vo.SendMailInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -28,10 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -202,57 +202,33 @@ public class BoardService {
      */
     public int saveBoardByUploadExcel(MultipartFile excelFile) throws Exception {
         int successCount = 0;
-        int failCount = 0;
         List<AddBoardIn> failList = new ArrayList<>();
-//        String filePath = UPLOAD_FILE_PATH + "//" + excelFile.getOriginalFilename();
-        OPCPackage opcPackage = OPCPackage.open(excelFile.getInputStream());
-        XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
-        XSSFSheet sheet = workbook.getSheetAt(0);
+        AddBoardIn boardIn = new AddBoardIn();
 
-        for (int i=1; i<sheet.getLastRowNum() + 1; i++) {
-            AddBoardIn boardIn = new AddBoardIn();
-            try {
-                XSSFRow row = sheet.getRow(i);
-                XSSFCell cell = null;
-
-                if (row == null)
-                    continue;
-
-                // 엑셀 데이터로 게시글 정보 세팅
-                // XXX: 이게 맞냐..?
-                cell = row.getCell(0);
-                if (cell != null) {
-                    boardIn.setBoardTitle(cell.getStringCellValue());
-                }
-                cell = row.getCell(1);
-                if (cell != null) {
-                    boardIn.setBoardContent(cell.getStringCellValue());
-                }
-                cell = row.getCell(2);
-                if (cell != null) {
-                    boardIn.setRegUserId(cell.getStringCellValue());
-                }
-                cell = row.getCell(3);
-                if (cell != null) {
-                    String tags = row.getCell(3).getStringCellValue();
+        try {
+            ExcelSheetHandler excelSheetHandler = ExcelSheetHandler.readExcel(excelFile);
+            List<Map<String, Object>> excelDatas = excelSheetHandler.getRows();
+            for (Map<String, Object> excelData: excelDatas) {
+                boardIn.setBoardTitle(String.valueOf(Optional.ofNullable(excelData.get("boardTitle")).orElseGet(() -> "")));
+                boardIn.setBoardContent(String.valueOf(Optional.ofNullable(excelData.get("boardContent")).orElseGet(() -> "")));
+                boardIn.setRegUserId(String.valueOf(Optional.ofNullable(excelData.get("regUserId")).orElseGet(() -> "")));
+                String tags = String.valueOf(Optional.ofNullable(excelData.get("tagList")).orElseGet(() -> ""));
+                if (!StringUtils.isEmpty(tags)) {
                     List<Tag> tagList = new ArrayList<>();
-                    if (!StringUtils.isEmpty(row.getCell(3).getStringCellValue())) {
-                        for (String tag: tags.split(",")){
-                            Tag tagInfo = Tag.builder()
-                                    .tagName(tag)
-                                    .build();
-                            tagList.add(tagInfo);
-                        }
+                    for (String tag: tags.split(",")) {
+                        Tag tagInfo = Tag.builder()
+                                .tagName(tag)
+                                .build();
+                        tagList.add(tagInfo);
                     }
                     boardIn.setTagList(tagList);
                 }
-                // 게시판 정보 저장
                 successCount += saveBoard(boardIn);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                failCount++;
-                failList.add(boardIn);
             }
+        } catch (Exception e) {
+            log.error("[ERROR] saveBoardByUploadExcel :::");
+            e.printStackTrace();
+            failList.add(boardIn);
         }
 
         if (!failList.isEmpty()) {
