@@ -27,8 +27,9 @@ dependencies {
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation 'org.apache.poi:poi:3.9'
-    implementation 'org.apache.poi:poi-ooxml:3.9'
+    implementation 'org.apache.poi:poi:4.1.2'
+    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'sax:sax:2.0.1'
 
     implementation 'commons-fileupload:commons-fileupload:1.4'
 
